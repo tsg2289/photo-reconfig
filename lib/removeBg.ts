@@ -5,7 +5,7 @@ export async function removeBackground(
   apiKey: string
 ): Promise<Buffer> {
   const formData = new FormData();
-  formData.append("image_file", new Blob([imageBuffer]), "image.jpg");
+  formData.append("image_file", new Blob([new Uint8Array(imageBuffer)]), "image.jpg");
   formData.append("size", "auto");
   formData.append("bg_color", "ffffff");
   formData.append("format", "jpg");
