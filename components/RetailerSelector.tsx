@@ -5,8 +5,6 @@ import type { RetailerId } from "@/lib/platformSpecs";
 
 const RETAILERS: { id: RetailerId; label: string }[] = [
   { id: "amazon", label: "Amazon" },
-  { id: "walmart", label: "Walmart" },
-  { id: "target", label: "Target" },
 ];
 
 interface RetailerSelectorProps {
@@ -47,20 +45,14 @@ export function RetailerSelector({ selected, onChange }: RetailerSelectorProps) 
 
       <div className="mt-4 border-t border-white/20 pt-4">
         <p className="mb-3 text-sm font-medium text-foreground/80">
-          Dimensions by vendor
+          Dimensions
         </p>
         <div className="space-y-3 text-sm text-foreground/90">
           <div>
-            <span className="font-medium">Amazon:</span> Main 2000×2000 (1:1);
-            Secondary 2000×2000 (square), 1600×1920 (5:6 portrait)
+            <span className="font-medium">Image 1 (main):</span> 2048×2560
           </div>
           <div>
-            <span className="font-medium">Walmart:</span> Main & secondary
-            2200×2200 (1:1)
-          </div>
-          <div>
-            <span className="font-medium">Target:</span> Main & secondary
-            2400×2400 (1:1)
+            <span className="font-medium">Images 2–6:</span> 1600×1600
           </div>
         </div>
       </div>

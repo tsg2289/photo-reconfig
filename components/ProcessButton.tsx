@@ -6,12 +6,14 @@ import type { RetailerId } from "@/lib/platformSpecs";
 
 interface ProcessButtonProps {
   files: File[];
+  sku: string;
   retailers: RetailerId[];
   disabled: boolean;
 }
 
 export function ProcessButton({
   files,
+  sku,
   retailers,
   disabled,
 }: ProcessButtonProps) {
@@ -28,6 +30,7 @@ export function ProcessButton({
       const formData = new FormData();
       files.forEach((f) => formData.append("images", f));
       retailers.forEach((r) => formData.append("retailers", r));
+      if (sku.trim()) formData.append("sku", sku.trim());
       formData.append("useAi", "no");
 
       const res = await fetch("/api/process", {
@@ -44,7 +47,8 @@ export function ProcessButton({
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "photo-reconfig.zip";
+      const zipFilename = res.headers.get("Content-Disposition")?.match(/filename="?([^";]+)"?/)?.[1] ?? "photo-reconfig.zip";
+      a.download = zipFilename;
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {

@@ -3,6 +3,7 @@ import archiver from "archiver";
 import {
   processImageForRetailer,
   sanitizeFilename,
+  sanitizeSku,
 } from "@/lib/imageProcessor";
 import type { RetailerId } from "@/lib/platformSpecs";
 
@@ -11,6 +12,8 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const imageFiles = formData.getAll("images") as File[];
     const retailers = formData.getAll("retailers") as RetailerId[];
+    const skuRaw = formData.get("sku") as string | null;
+    const skuBase = skuRaw?.trim() ? sanitizeSku(skuRaw.trim()) : undefined;
 
     if (!imageFiles.length || !retailers.length) {
       return NextResponse.json(
@@ -33,7 +36,8 @@ export async function POST(request: NextRequest) {
           retailer,
           baseName,
           i,
-          isFirst
+          isFirst,
+          skuBase
         );
 
         for (const { buffer: imgBuffer, folder, filename } of results) {
@@ -60,10 +64,11 @@ export async function POST(request: NextRequest) {
     });
 
     const zipBuffer = Buffer.concat(chunks);
+    const zipFilename = skuBase ? `${skuBase}.zip` : "photo-reconfig.zip";
     return new NextResponse(zipBuffer, {
       headers: {
         "Content-Type": "application/zip",
-        "Content-Disposition": "attachment; filename=photo-reconfig.zip",
+        "Content-Disposition": `attachment; filename="${zipFilename}"`,
       },
     });
   } catch (err) {

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Photo Reconfig",
-  description: "Batch process product images for Amazon, Walmart & Target",
+  description: "Batch process product images for Amazon",
 };
 
 export default function RootLayout({
