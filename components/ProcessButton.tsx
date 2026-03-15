@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { GlassCard } from "./GlassCard";
 import type { RetailerId } from "@/lib/platformSpecs";
+import { compressImageForUpload } from "@/lib/compressImage";
 
 interface ProcessButtonProps {
   files: File[];
@@ -27,8 +28,13 @@ export function ProcessButton({
     setError(null);
 
     try {
+      // Compress images client-side to avoid 413 Payload Too Large
+      const compressed = await Promise.all(
+        files.map((f) => compressImageForUpload(f))
+      );
+
       const formData = new FormData();
-      files.forEach((f) => formData.append("images", f));
+      compressed.forEach((f) => formData.append("images", f));
       retailers.forEach((r) => formData.append("retailers", r));
       if (sku.trim()) formData.append("sku", sku.trim());
       formData.append("useAi", "no");
@@ -39,6 +45,11 @@ export function ProcessButton({
       });
 
       if (!res.ok) {
+        if (res.status === 413) {
+          throw new Error(
+            "Images are too large. Try uploading fewer images or smaller files."
+          );
+        }
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || `Process failed: ${res.status}`);
       }
