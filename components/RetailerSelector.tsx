@@ -1,11 +1,15 @@
 "use client";
 
 import { GlassCard } from "./GlassCard";
-import type { RetailerId } from "@/lib/platformSpecs";
+import {
+  PLATFORMS,
+  RETAILER_LABELS,
+  type RetailerId,
+} from "@/lib/platformSpecs";
 
-const RETAILERS: { id: RetailerId; label: string }[] = [
-  { id: "amazon", label: "Amazon" },
-];
+const RETAILERS = (Object.entries(RETAILER_LABELS) as [RetailerId, string][]).map(
+  ([id, label]) => ({ id, label })
+);
 
 interface RetailerSelectorProps {
   selected: RetailerId[];
@@ -20,6 +24,12 @@ export function RetailerSelector({ selected, onChange }: RetailerSelectorProps) 
       onChange([...selected, id]);
     }
   };
+
+  const selectedRetailers = selected.map((id) => ({
+    id,
+    label: RETAILER_LABELS[id],
+    specs: PLATFORMS[id],
+  }));
 
   return (
     <GlassCard className="p-6">
@@ -47,14 +57,27 @@ export function RetailerSelector({ selected, onChange }: RetailerSelectorProps) 
         <p className="mb-3 text-sm font-medium text-foreground/80">
           Dimensions
         </p>
-        <div className="space-y-3 text-sm text-foreground/90">
-          <div>
-            <span className="font-medium">Image 1 (main):</span> 2048×2560
+        {selectedRetailers.length > 0 ? (
+          <div className="space-y-4 text-sm text-foreground/90">
+            {selectedRetailers.map(({ id, label, specs }) => (
+              <div key={id} className="space-y-2">
+                <p className="font-medium text-foreground">{label}</p>
+                <div>
+                  <span className="font-medium">Image 1 (main):</span>{" "}
+                  {specs.main.width}x{specs.main.height}
+                </div>
+                <div>
+                  <span className="font-medium">Images 2–6:</span>{" "}
+                  {specs.secondary[0].width}x{specs.secondary[0].height}
+                </div>
+              </div>
+            ))}
           </div>
-          <div>
-            <span className="font-medium">Images 2–6:</span> 1600×1600
-          </div>
-        </div>
+        ) : (
+          <p className="text-sm text-foreground/70">
+            Select a retailer to view dimensions.
+          </p>
+        )}
       </div>
     </GlassCard>
   );
