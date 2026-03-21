@@ -9,6 +9,7 @@ interface ProcessButtonProps {
   files: File[];
   sku: string;
   retailers: RetailerId[];
+  funboyIncludeMain: boolean;
   disabled: boolean;
 }
 
@@ -16,6 +17,7 @@ export function ProcessButton({
   files,
   sku,
   retailers,
+  funboyIncludeMain,
   disabled,
 }: ProcessButtonProps) {
   const [loading, setLoading] = useState(false);
@@ -36,6 +38,9 @@ export function ProcessButton({
       const formData = new FormData();
       compressed.forEach((f) => formData.append("images", f));
       retailers.forEach((r) => formData.append("retailers", r));
+      if (retailers.includes("funboy")) {
+        formData.append("funboyIncludeMain", String(funboyIncludeMain));
+      }
       if (sku.trim()) formData.append("sku", sku.trim());
       formData.append("useAi", "no");
 

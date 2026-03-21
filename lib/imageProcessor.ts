@@ -7,7 +7,11 @@ export async function processImage(
   spec: ImageSpec
 ): Promise<Buffer> {
   return sharp(inputBuffer)
-    .resize(spec.width, spec.height, { fit: "cover", position: "center" })
+    .resize(spec.width, spec.height, {
+      fit: "contain",
+      position: "center",
+      background: { r: 255, g: 255, b: 255, alpha: 1 },
+    })
     .jpeg({ quality: 90 })
     .toBuffer();
 }
@@ -24,16 +28,21 @@ export async function processImageForRetailer(
   baseName: string,
   imageIndex: number,
   isFirstImage: boolean,
-  skuBase?: string
+  skuBase?: string,
+  options?: {
+    includeMain?: boolean;
+  }
 ): Promise<ProcessedFile[]> {
   const config = PLATFORMS[retailer];
   const results: ProcessedFile[] = [];
   const imageNum = imageIndex + 1;
+  const includeMain = options?.includeMain ?? true;
+  const shouldCreateMain = isFirstImage && includeMain;
 
   if (skuBase) {
     // SKU mode: one file per image, named SKU-1, SKU-2, etc.
     const filename = `${skuBase}-${imageNum}.jpg`;
-    if (isFirstImage) {
+    if (shouldCreateMain) {
       const buffer = await processImage(inputBuffer, config.main);
       results.push({ buffer, folder: "main", filename });
     } else {
@@ -47,7 +56,7 @@ export async function processImageForRetailer(
   // Original mode: main + secondary variants
   const idx = String(imageNum).padStart(2, "0");
 
-  if (isFirstImage) {
+  if (shouldCreateMain) {
     const buffer = await processImage(inputBuffer, config.main);
     results.push({
       buffer,

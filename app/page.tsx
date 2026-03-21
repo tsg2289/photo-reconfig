@@ -11,6 +11,7 @@ export default function Home() {
   const [files, setFiles] = useState<File[]>([]);
   const [sku, setSku] = useState("");
   const [retailers, setRetailers] = useState<RetailerId[]>(["funboy"]);
+  const [funboyIncludeMain, setFunboyIncludeMain] = useState(true);
 
   return (
     <div className="flex min-h-screen flex-col items-center px-4 py-12">
@@ -28,12 +29,18 @@ export default function Home() {
 
         <SkuInput value={sku} onChange={setSku} />
 
-        <RetailerSelector selected={retailers} onChange={setRetailers} />
+        <RetailerSelector
+          selected={retailers}
+          onChange={setRetailers}
+          funboyIncludeMain={funboyIncludeMain}
+          onFunboyIncludeMainChange={setFunboyIncludeMain}
+        />
 
         <ProcessButton
           files={files}
           sku={sku}
           retailers={retailers}
+          funboyIncludeMain={funboyIncludeMain}
           disabled={false}
         />
       </div>

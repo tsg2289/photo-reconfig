@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
     const retailers = formData.getAll("retailers") as RetailerId[];
     const skuRaw = formData.get("sku") as string | null;
     const skuBase = skuRaw?.trim() ? sanitizeSku(skuRaw.trim()) : undefined;
+    const funboyIncludeMain = formData.get("funboyIncludeMain") !== "false";
 
     if (!imageFiles.length || !retailers.length) {
       return NextResponse.json(
@@ -37,7 +38,10 @@ export async function POST(request: NextRequest) {
           baseName,
           i,
           isFirst,
-          skuBase
+          skuBase,
+          {
+            includeMain: retailer === "funboy" ? funboyIncludeMain : true,
+          }
         );
 
         for (const { buffer: imgBuffer, folder, filename } of results) {

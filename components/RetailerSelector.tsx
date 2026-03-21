@@ -14,9 +14,16 @@ const RETAILERS = (Object.entries(RETAILER_LABELS) as [RetailerId, string][]).ma
 interface RetailerSelectorProps {
   selected: RetailerId[];
   onChange: (selected: RetailerId[]) => void;
+  funboyIncludeMain: boolean;
+  onFunboyIncludeMainChange: (includeMain: boolean) => void;
 }
 
-export function RetailerSelector({ selected, onChange }: RetailerSelectorProps) {
+export function RetailerSelector({
+  selected,
+  onChange,
+  funboyIncludeMain,
+  onFunboyIncludeMainChange,
+}: RetailerSelectorProps) {
   const toggle = (id: RetailerId) => {
     if (selected.includes(id)) {
       onChange(selected.filter((r) => r !== id));
@@ -30,6 +37,7 @@ export function RetailerSelector({ selected, onChange }: RetailerSelectorProps) 
     label: RETAILER_LABELS[id],
     specs: PLATFORMS[id],
   }));
+  const showFunboyMainToggle = selected.includes("funboy");
 
   return (
     <GlassCard className="p-6">
@@ -53,6 +61,18 @@ export function RetailerSelector({ selected, onChange }: RetailerSelectorProps) 
         ))}
       </div>
 
+      {showFunboyMainToggle && (
+        <label className="mt-4 flex items-center gap-3 text-sm text-foreground/90">
+          <input
+            type="checkbox"
+            checked={funboyIncludeMain}
+            onChange={(event) => onFunboyIncludeMainChange(event.target.checked)}
+            className="h-4 w-4 rounded border-white/20 bg-white/10"
+          />
+          <span>Include main image for Funboy</span>
+        </label>
+      )}
+
       <div className="mt-4 border-t border-white/20 pt-4">
         <p className="mb-3 text-sm font-medium text-foreground/80">
           Dimensions
@@ -62,12 +82,22 @@ export function RetailerSelector({ selected, onChange }: RetailerSelectorProps) 
             {selectedRetailers.map(({ id, label, specs }) => (
               <div key={id} className="space-y-2">
                 <p className="font-medium text-foreground">{label}</p>
+                {id === "funboy" && !funboyIncludeMain ? (
+                  <div>
+                    <span className="font-medium">Main image:</span> Not included
+                  </div>
+                ) : (
+                  <div>
+                    <span className="font-medium">Image 1 (main):</span>{" "}
+                    {specs.main.width}x{specs.main.height}
+                  </div>
+                )}
                 <div>
-                  <span className="font-medium">Image 1 (main):</span>{" "}
-                  {specs.main.width}x{specs.main.height}
-                </div>
-                <div>
-                  <span className="font-medium">Images 2–6:</span>{" "}
+                  <span className="font-medium">
+                    {id === "funboy" && !funboyIncludeMain
+                      ? "Images 1–6:"
+                      : "Images 2–6:"}
+                  </span>{" "}
                   {specs.secondary[0].width}x{specs.secondary[0].height}
                 </div>
               </div>
