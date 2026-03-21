@@ -2,15 +2,32 @@ import sharp from "sharp";
 import type { ImageSpec, RetailerId } from "./platformSpecs";
 import { PLATFORMS } from "./platformSpecs";
 
+const OUTPUT_BACKGROUND = { r: 255, g: 255, b: 255, alpha: 1 };
+const SAFE_MARGIN_RATIO = 0.04;
+
 export async function processImage(
   inputBuffer: Buffer,
   spec: ImageSpec
 ): Promise<Buffer> {
+  const horizontalPadding = Math.max(12, Math.round(spec.width * SAFE_MARGIN_RATIO));
+  const verticalPadding = Math.max(12, Math.round(spec.height * SAFE_MARGIN_RATIO));
+  const innerWidth = Math.max(1, spec.width - horizontalPadding * 2);
+  const innerHeight = Math.max(1, spec.height - verticalPadding * 2);
+
   return sharp(inputBuffer)
-    .resize(spec.width, spec.height, {
+    .flatten({ background: OUTPUT_BACKGROUND })
+    .trim({ background: OUTPUT_BACKGROUND, threshold: 10 })
+    .resize(innerWidth, innerHeight, {
       fit: "contain",
       position: "center",
-      background: { r: 255, g: 255, b: 255, alpha: 1 },
+      background: OUTPUT_BACKGROUND,
+    })
+    .extend({
+      top: verticalPadding,
+      bottom: verticalPadding,
+      left: horizontalPadding,
+      right: horizontalPadding,
+      background: OUTPUT_BACKGROUND,
     })
     .jpeg({ quality: 90 })
     .toBuffer();
