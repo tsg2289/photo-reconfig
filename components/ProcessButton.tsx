@@ -3,13 +3,26 @@
 import { useState } from "react";
 import { GlassCard } from "./GlassCard";
 import type { RetailerId } from "@/lib/platformSpecs";
-import { compressImageForUpload } from "@/lib/compressImage";
+import {
+  compressImageForUpload,
+  type CompressionPreset,
+} from "@/lib/compressImage";
+
+const COMPRESSION_PRESETS: { id: CompressionPreset; label: string }[] = [
+  { id: "high", label: "High quality" },
+  { id: "balanced", label: "Balanced" },
+  { id: "smallest", label: "Smallest file" },
+];
 
 interface ProcessButtonProps {
   files: File[];
   sku: string;
   retailers: RetailerId[];
   funboyIncludeMain: boolean;
+  compressUploads: boolean;
+  onCompressUploadsChange: (enabled: boolean) => void;
+  compressionPreset: CompressionPreset;
+  onCompressionPresetChange: (preset: CompressionPreset) => void;
   disabled: boolean;
 }
 
@@ -18,6 +31,10 @@ export function ProcessButton({
   sku,
   retailers,
   funboyIncludeMain,
+  compressUploads,
+  onCompressUploadsChange,
+  compressionPreset,
+  onCompressionPresetChange,
   disabled,
 }: ProcessButtonProps) {
   const [loading, setLoading] = useState(false);
@@ -30,9 +47,13 @@ export function ProcessButton({
     setError(null);
 
     try {
-      // Compress images client-side to avoid 413 Payload Too Large
       const compressed = await Promise.all(
-        files.map((f) => compressImageForUpload(f))
+        files.map((f) =>
+          compressImageForUpload(f, {
+            enabled: compressUploads,
+            preset: compressionPreset,
+          })
+        )
       );
 
       const formData = new FormData();
@@ -78,6 +99,47 @@ export function ProcessButton({
 
   return (
     <GlassCard className="p-6">
+      <div className="mb-5 space-y-4 border-b border-white/20 pb-5">
+        <label className="flex items-center gap-3 text-sm text-foreground/90">
+          <input
+            type="checkbox"
+            checked={compressUploads}
+            onChange={(event) => onCompressUploadsChange(event.target.checked)}
+            className="h-4 w-4 rounded border-white/20 bg-white/10"
+          />
+          <span>Compress images before upload</span>
+        </label>
+
+        <div className="space-y-2">
+          <label
+            htmlFor="compression-preset"
+            className="block text-sm font-medium text-foreground/80"
+          >
+            Compression level
+          </label>
+          <select
+            id="compression-preset"
+            value={compressionPreset}
+            onChange={(event) =>
+              onCompressionPresetChange(event.target.value as CompressionPreset)
+            }
+            disabled={!compressUploads || loading}
+            className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-foreground outline-none transition focus:border-white/35 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {COMPRESSION_PRESETS.map(({ id, label }) => (
+              <option key={id} value={id} className="bg-slate-900 text-white">
+                {label}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-foreground/60">
+            {compressUploads
+              ? "High quality keeps more detail, while smaller presets reduce upload size more aggressively."
+              : "Compression is off. Original uploads may be slower or too large to process."}
+          </p>
+        </div>
+      </div>
+
       <button
         type="button"
         onClick={handleProcess}

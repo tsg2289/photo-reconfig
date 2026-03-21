@@ -6,12 +6,16 @@ import { SkuInput } from "@/components/SkuInput";
 import { RetailerSelector } from "@/components/RetailerSelector";
 import { ProcessButton } from "@/components/ProcessButton";
 import type { RetailerId } from "@/lib/platformSpecs";
+import type { CompressionPreset } from "@/lib/compressImage";
 
 export default function Home() {
   const [files, setFiles] = useState<File[]>([]);
   const [sku, setSku] = useState("");
   const [retailers, setRetailers] = useState<RetailerId[]>(["funboy"]);
   const [funboyIncludeMain, setFunboyIncludeMain] = useState(true);
+  const [compressUploads, setCompressUploads] = useState(true);
+  const [compressionPreset, setCompressionPreset] =
+    useState<CompressionPreset>("balanced");
 
   return (
     <div className="flex min-h-screen flex-col items-center px-4 py-12">
@@ -41,6 +45,10 @@ export default function Home() {
           sku={sku}
           retailers={retailers}
           funboyIncludeMain={funboyIncludeMain}
+          compressUploads={compressUploads}
+          onCompressUploadsChange={setCompressUploads}
+          compressionPreset={compressionPreset}
+          onCompressionPresetChange={setCompressionPreset}
           disabled={false}
         />
       </div>
