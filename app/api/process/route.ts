@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import archiver from "archiver";
 import {
+  detectImageContentType,
   processImageForRetailer,
   sanitizeFilename,
   sanitizeSku,
@@ -23,13 +24,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const preparedImages = await Promise.all(
+      imageFiles.map(async (file) => {
+        const buffer = Buffer.from(await file.arrayBuffer());
+        return {
+          buffer,
+          baseName: sanitizeFilename(file.name),
+          contentType: await detectImageContentType(buffer),
+        };
+      })
+    );
+
     const entries: { path: string; buffer: Buffer }[] = [];
 
     for (const retailer of retailers) {
-      for (let i = 0; i < imageFiles.length; i++) {
-        const file = imageFiles[i];
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const baseName = sanitizeFilename(file.name);
+      for (let i = 0; i < preparedImages.length; i++) {
+        const { buffer, baseName, contentType } = preparedImages[i];
         const isFirst = i === 0;
 
         const results = await processImageForRetailer(
@@ -38,6 +48,7 @@ export async function POST(request: NextRequest) {
           baseName,
           i,
           isFirst,
+          contentType,
           skuBase,
           {
             includeMain: retailer === "funboy" ? funboyIncludeMain : true,

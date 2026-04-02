@@ -48,8 +48,8 @@ export function ProcessButton({
 
     try {
       const compressed = await Promise.all(
-        files.map((f) =>
-          compressImageForUpload(f, {
+        files.map((file) =>
+          compressImageForUpload(file, {
             enabled: compressUploads,
             preset: compressionPreset,
           })
@@ -57,7 +57,7 @@ export function ProcessButton({
       );
 
       const formData = new FormData();
-      compressed.forEach((f) => formData.append("images", f));
+      compressed.forEach((file) => formData.append("images", file));
       retailers.forEach((r) => formData.append("retailers", r));
       if (retailers.includes("funboy")) {
         formData.append("funboyIncludeMain", String(funboyIncludeMain));
@@ -95,7 +95,8 @@ export function ProcessButton({
     }
   };
 
-  const isDisabled = disabled || loading || files.length === 0 || retailers.length === 0;
+  const isDisabled =
+    disabled || loading || files.length === 0 || retailers.length === 0;
 
   return (
     <GlassCard className="p-6">

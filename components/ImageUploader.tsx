@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo } from "react";
+import Image from "next/image";
 import { useDropzone } from "react-dropzone";
 import { GlassCard } from "./GlassCard";
 
@@ -30,8 +31,14 @@ export function ImageUploader({ files, onFilesChange }: ImageUploaderProps) {
     multiple: true,
   });
 
-  const thumbUrls = useMemo(() => files.map((f) => URL.createObjectURL(f)), [files]);
-  useEffect(() => () => thumbUrls.forEach((u) => URL.revokeObjectURL(u)), [thumbUrls]);
+  const thumbUrls = useMemo(
+    () => files.map((file) => URL.createObjectURL(file)),
+    [files]
+  );
+  useEffect(
+    () => () => thumbUrls.forEach((u) => URL.revokeObjectURL(u)),
+    [thumbUrls]
+  );
 
   const removeFile = (index: number) => {
     onFilesChange(files.filter((_, i) => i !== index));
@@ -68,18 +75,21 @@ export function ImageUploader({ files, onFilesChange }: ImageUploaderProps) {
           <p className="mb-2 text-sm font-medium text-foreground/80">
             {files.length} image{files.length !== 1 ? "s" : ""} selected
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="space-y-3">
             {files.map((file, i) => (
               <div
                 key={`${file.name}-${i}`}
-                className="group relative flex items-center gap-2 rounded-lg bg-white/10 px-3 py-2"
+                className="group relative flex flex-wrap items-center gap-3 rounded-lg bg-white/10 px-3 py-3"
               >
-                <img
+                <Image
                   src={thumbUrls[i]}
                   alt=""
+                  width={48}
+                  height={48}
+                  unoptimized
                   className="h-12 w-12 rounded object-cover"
                 />
-                <span className="max-w-[120px] truncate text-sm text-foreground/90">
+                <span className="min-w-0 max-w-[140px] truncate text-sm text-foreground/90">
                   {file.name}
                 </span>
                 {i === 0 && (
@@ -120,6 +130,10 @@ export function ImageUploader({ files, onFilesChange }: ImageUploaderProps) {
               </div>
             ))}
           </div>
+          <p className="mt-3 text-xs text-foreground/60">
+            People and lifestyle shots are detected automatically during
+            processing.
+          </p>
         </div>
       )}
     </GlassCard>
