@@ -131,8 +131,9 @@ export function ImageUploader({ files, onFilesChange }: ImageUploaderProps) {
             ))}
           </div>
           <p className="mt-3 text-xs text-foreground/60">
-            People and lifestyle shots are detected automatically during
-            processing.
+            Real-environment shots like pool or lawn images are processed
+            edge-to-edge with no white added. White studio shots can keep
+            their white background.
           </p>
         </div>
       )}

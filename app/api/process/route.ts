@@ -55,9 +55,9 @@ export async function POST(request: NextRequest) {
           }
         );
 
-        for (const { buffer: imgBuffer, folder, filename } of results) {
+        for (const { buffer: imgBuffer, filename } of results) {
           entries.push({
-            path: `${retailer}/${folder}/${filename}`,
+            path: `${retailer}/${filename}`,
             buffer: imgBuffer,
           });
         }

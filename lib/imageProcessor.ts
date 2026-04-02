@@ -124,7 +124,18 @@ export async function detectImageContentType(
     return "lifestyle";
   }
 
-  return whiteRatio >= 0.32 ? "product" : "lifestyle";
+  // Only preserve white when the image still reads as a studio shot.
+  if (
+    !touchesFrame &&
+    whiteRatio >= 0.4 &&
+    borderWhiteRatio >= 0.58 &&
+    cornerWhiteRatio >= 0.58 &&
+    subjectCoverage <= 0.86
+  ) {
+    return "product";
+  }
+
+  return "lifestyle";
 }
 
 export async function processImage(
@@ -136,6 +147,7 @@ export async function processImage(
     contentType ?? (await detectImageContentType(inputBuffer));
 
   if (resolvedContentType === "lifestyle") {
+    // Real-environment shots should fill the frame without white margins.
     return sharp(inputBuffer)
       .resize(spec.width, spec.height, {
         fit: "cover",

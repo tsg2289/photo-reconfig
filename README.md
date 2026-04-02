@@ -7,6 +7,7 @@ Batch process product images for Amazon. Converts JPEGs to Amazon-specific dimen
 - **3-step workflow:** Drop images → Select retailer → Process & download
 - **Platform specs:** Image 1 (main) 2048×2560; Images 2–6: 1600×1600
 - **Main + secondary:** First image = main; all images get secondary variants
+- **Background-aware processing:** Real-environment shots fill the frame; white studio shots can keep white background
 - **AI background removal:** Optional remove.bg integration for pure white backgrounds
 - **Apple Glassmorphism UI:** Clean, frosted-glass design
 
@@ -46,7 +47,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 1. **Drop images** – Drag and drop or click to browse. JPEG, PNG, WebP supported. First image = main product shot.
 2. **Select retailer** – Amazon (default).
-3. **Process** – Click "Process & Download ZIP". A ZIP downloads with folders per retailer (`amazon/main/`, `amazon/secondary/`, etc.).
+3. **Process** – Click "Process & Download ZIP". A ZIP downloads with one folder per retailer (`amazon/`, `funboy/`, etc.).
 
 ## Platform specifications
 
